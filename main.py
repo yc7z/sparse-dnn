@@ -12,9 +12,8 @@ import torch.nn as nn
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="PyTorch CIFAR10 DP Training")
 
-    parser.add_argument("--epochs", default=1, type=int,)
+    parser.add_argument("--epochs", default=15, type=int,)
     parser.add_argument("--batch_size", default=100, type=int)
-    parser.add_argument("--sample-rate", default=0.04, type=float)
     parser.add_argument("--lr", default=4e-2, type=float)
     parser.add_argument("--momentum", default=0.9, type=float)
     parser.add_argument("--sparsity_level", default=0.1, type=float)

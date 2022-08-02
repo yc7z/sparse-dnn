@@ -1,5 +1,6 @@
 from math import ceil
 import torch
+import torch.nn as nn
 
 
 class Experiment():
@@ -66,9 +67,11 @@ class SparseBenchmarkClassifier(Experiment):
     
     
     def reset_model(self):
-        for layer in self.model.children():
-            if hasattr(layer, 'reset_parameters'):
-                layer.reset_parameters()
+        def weight_reset(m):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                m.reset_parameters()
+
+        self.model.apply(weight_reset)
 
     
     def run(self):
@@ -82,7 +85,8 @@ class SparseBenchmarkClassifier(Experiment):
                 self.sparsify(interm_sparsity_level)
                 interm_sparsity_level *= self.sparsity_level
         
-        self.reset_model()
+        with torch.no_grad():
+            self.reset_model()
         
         for _ in range(1, self.epochs + 1):
             self.train_epoch()
