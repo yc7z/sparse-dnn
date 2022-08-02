@@ -31,11 +31,11 @@ class SparseBenchmarkClassifier(Experiment):
     def train_epoch(self):
         self.model.train()
         for batch_idx, (inputs, targets) in enumerate(self.trainloader):
+            self.optimizer.zero_grad()
             outputs = self.model(inputs)
             loss = self.criterion(outputs, targets)
             loss.backward()
             self.optimizer.step()
-            self.optimizer.zero_grad()
     
     
     def test_accuracy(self):
@@ -74,10 +74,17 @@ class SparseBenchmarkClassifier(Experiment):
         self.model.apply(weight_reset)
 
     
-    def run(self):
+    def run_sparse(self):
         interm_sparsity_level = self.sparsity_level ** (1/self.epochs)
         sparse_accuracies = []
-        dense_accuracies = []
+        # dense_accuracies = []
+        # for _ in range(1, self.epochs + 1):
+        #     self.train_epoch()
+        #     dense_accuracies.append(self.test_accuracy())
+        
+        # with torch.no_grad():
+        #     self.reset_model()
+            
         for _ in range(1, self.epochs + 1):
             self.train_epoch()
             sparse_accuracies.append(self.test_accuracy())
@@ -85,11 +92,18 @@ class SparseBenchmarkClassifier(Experiment):
                 self.sparsify(interm_sparsity_level)
                 interm_sparsity_level *= self.sparsity_level
         
-        with torch.no_grad():
-            self.reset_model()
+        # with torch.no_grad():
+        #     self.reset_model()
         
+        # for _ in range(1, self.epochs + 1):
+        #     self.train_epoch()
+        #     dense_accuracies.append(self.test_accuracy())
+        return sparse_accuracies
+
+    
+    def run_dense(self):
+        dense_accuracies = []
         for _ in range(1, self.epochs + 1):
             self.train_epoch()
             dense_accuracies.append(self.test_accuracy())
-        
-        return sparse_accuracies, dense_accuracies
+        return dense_accuracies

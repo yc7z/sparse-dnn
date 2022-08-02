@@ -12,11 +12,11 @@ import torch.nn as nn
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="PyTorch CIFAR10 DP Training")
 
-    parser.add_argument("--epochs", default=15, type=int,)
+    parser.add_argument("--epochs", default=25, type=int)
     parser.add_argument("--batch_size", default=100, type=int)
     parser.add_argument("--lr", default=4e-2, type=float)
     parser.add_argument("--momentum", default=0.9, type=float)
-    parser.add_argument("--sparsity_level", default=0.1, type=float)
+    parser.add_argument("--sparsity_level", default=0.5, type=float)
     
     args = parser.parse_args()
     
@@ -44,10 +44,10 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     experiment = SparseBenchmarkClassifier(model)
     experiment.set_up_exp(args, trainloader, testloader, optimizer, criterion)
-    sparse_accuracies, dense_accuracies = experiment.run()
+    # sparse_accuracies = experiment.run_sparse()
+    dense_accuracies = experiment.run_dense()
+    print(dense_accuracies)
     
-    epochs_lst = [_ for _ in range(1, args.epochs + 1)]
-    plt.plot(epochs_lst, sparse_accuracies, label='sparse')
-    plt.plot(epochs_lst, dense_accuracies, label='dense')
-    plt.legend(loc="lower center", bbox_to_anchor=(0.8, 0.25))
-    plt.savefig('./sparse_acc_plot')
+    # epochs_lst = [_ for _ in range(1, args.epochs + 1)]
+    # plt.legend(loc="lower center", bbox_to_anchor=(0.8, 0.25))
+    # plt.savefig('./sparse_acc_plot(1)')
