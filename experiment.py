@@ -77,7 +77,7 @@ class SparseBenchmarkClassifier(Experiment):
         dense_accuracies = []
         for _ in range(1, self.epochs + 1):
             self.train_epoch()
-            sparse_accuracies.append(self.test_accuracy(self.testloader))
+            sparse_accuracies.append(self.test_accuracy())
             with torch.no_grad():
                 self.sparsify(interm_sparsity_level)
                 interm_sparsity_level *= self.sparsity_level
@@ -86,6 +86,6 @@ class SparseBenchmarkClassifier(Experiment):
         
         for _ in range(1, self.epochs + 1):
             self.train_epoch()
-            dense_accuracies.append(self.test_accuracy(self.testloader))
+            dense_accuracies.append(self.test_accuracy())
         
         return sparse_accuracies, dense_accuracies
