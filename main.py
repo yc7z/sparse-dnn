@@ -44,7 +44,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(params=model.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss()
     experiment = SparseBenchmarkClassifier(model)
-    experiment.set_up_exp(trainloader, testloader, optimizer, criterion)
+    experiment.set_up_exp(args, trainloader, testloader, optimizer, criterion)
     sparse_accuracies, dense_accuracies = experiment.run()
     
     epochs_lst = [_ for _ in range(1, args.epochs + 1)]
@@ -52,7 +52,3 @@ if __name__ == '__main__':
     plt.plot(epochs_lst, dense_accuracies, label='dense')
     plt.legend(loc="lower center", bbox_to_anchor=(0.8, 0.25))
     plt.savefig('./sparse_acc_plot')
-    
-    
-
-    

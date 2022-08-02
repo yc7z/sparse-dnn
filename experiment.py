@@ -32,7 +32,7 @@ class SparseBenchmarkClassifier(Experiment):
         for batch_idx, (inputs, targets) in enumerate(self.trainloader):
             outputs = self.model(inputs)
             loss = self.criterion(outputs, targets)
-            loss.backwards()
+            loss.backward()
             self.optimizer.step()
             self.optimizer.zero_grad()
     
@@ -50,7 +50,7 @@ class SparseBenchmarkClassifier(Experiment):
         return correct_pred / len(self.testloader.dataset)            
             
     
-    def sparsify(self):
+    def sparsify(self, sparsity_level):
         """
         sparse_level is a positive real number between 0 to 1.
         components whose norm fall into the top sparse_level percentile will be kept,
@@ -58,7 +58,7 @@ class SparseBenchmarkClassifier(Experiment):
         """
         for param in self.model.parameters():
             p_flat = param.flatten()
-            k = ceil(len(p_flat) * self.sparsity_level)
+            k = ceil(len(p_flat) * sparsity_level)
             topk_vals, topk_inds = torch.topk(input=torch.abs(p_flat), k=k)
             mask = torch.zeros(size=p_flat.shape, device=topk_inds.device)
             mask.scatter_(0, topk_inds, 1, reduce='add')
@@ -76,19 +76,16 @@ class SparseBenchmarkClassifier(Experiment):
         sparse_accuracies = []
         dense_accuracies = []
         for _ in range(1, self.epochs + 1):
-            self.sparsify(interm_sparsity_level)
-            self.train_epoch(self.trainloader, self.optimizer, self.criterion)
+            self.train_epoch()
             sparse_accuracies.append(self.test_accuracy(self.testloader))
-            interm_sparsity_level *= self.sparsity_level
+            with torch.no_grad():
+                self.sparsify(interm_sparsity_level)
+                interm_sparsity_level *= self.sparsity_level
         
         self.reset_model()
         
         for _ in range(1, self.epochs + 1):
-            self.train_epoch(self.trainloader, self.optimizer, self.criterion)
+            self.train_epoch()
             dense_accuracies.append(self.test_accuracy(self.testloader))
         
         return sparse_accuracies, dense_accuracies
-        
-
-        
-    
