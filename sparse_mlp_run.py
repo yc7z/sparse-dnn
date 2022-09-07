@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", default=100, type=int)
     parser.add_argument("--lr", default=4e-2, type=float)
     parser.add_argument("--momentum", default=0.9, type=float)
-    parser.add_argument("--sparsity_level", default=0.5, type=float)
+    parser.add_argument("--sparsity_level", default=0.01, type=float)
     
     args = parser.parse_args()
     
@@ -39,8 +39,8 @@ if __name__ == '__main__':
     print(f'training device: {device}')
     print(f'training set size: {len(trainset)}')
     
-    model = sparse_mlp.SimpleSparseMLP(args.sparsity_level)
-    # model = sparse_mlp.SimpleMLP()
+    # model = sparse_mlp.SimpleSparseMLP(args.sparsity_level)
+    model = sparse_mlp.SimpleMLP()
     
     # optimizer = torch.optim.SparseAdam(params=model.parameters(), lr=args.lr)
     optimizer = None
